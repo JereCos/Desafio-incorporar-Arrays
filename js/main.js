@@ -13,6 +13,12 @@ let passwordUsuario;
 let permisosUsuario;
 let passwordCorrecto = true;
 let permisoCorrecto = true;
+let usuarios = [];
+let productos = [];
+let finalizar = true;
+let nombresUsuario = [];
+let passwordsUsuario = [];
+let productosNombre = [];
 
 //clase constructora de usuario
 class usuario{
@@ -21,10 +27,22 @@ class usuario{
         this.password = password;
         this.permisos = permisos;
     }
-    saludar(){
-        this.saludar = alert("Hola " + this.nombre);
+}
+
+//clase constructora de productos
+class producto{
+    constructor(nombre, precio, descuento, vendido){
+        this.nombre = nombre.toUpperCase();
+        this.precio = precio;
+        this.descuento = descuento;
+        this.vendido = vendido;
     }
 }
+
+//Función agregar producto
+function crearProducto(nombre, precio, descuento, vendido){
+    return new producto (nombre, precio, descuento, vendido);
+} 
 
 //función compra producto
 const comprarProducto = (nombreProducto, precio, descuento) => {
@@ -32,6 +50,9 @@ const comprarProducto = (nombreProducto, precio, descuento) => {
     console.log("El parcial es " + precioTotal);
     return (nombreProducto + " comprado/a");
 }
+
+//Función agregar productos al array productos
+const agregarProductos = (producto) => productos.push(producto);
 
 //función para compra
 function comprar (descuento){
@@ -45,22 +66,27 @@ function comprar (descuento){
             switch (opcion){
                 case "1":
                     console.log(comprarProducto("Madera", 100, descuento));
+                    agregarProductos(crearProducto("Madera", 100, descuento, true));
                     compraFinalizada = true;
                 break;
                 case "2":
                     console.log(comprarProducto("Arroz", 10, descuento));
+                    agregarProductos(crearProducto("Arroz", 10, descuento, true));
                     compraFinalizada = true;
                 break;
                 case "3":
                     console.log(comprarProducto("Sillón", 1000, descuento));
+                    agregarProductos(crearProducto("Sillón", 1000, descuento, true));
                     compraFinalizada = true;
                 break;
                 case "4":
                     console.log(comprarProducto("Migral", 150, descuento));
+                    agregarProductos(crearProducto("Migral", 150, descuento, true));
                     compraFinalizada = true;
                 break;
                 case "5":
                     console.log(comprarProducto("Foco", 50, descuento));
+                    agregarProductos(crearProducto("Foco", 50, descuento, true));
                     compraFinalizada = true;
                 break;
                 case "FINALIZAR":
@@ -73,34 +99,65 @@ function comprar (descuento){
     }while(compraFinalizada);
 }
 
+//Función saludar usuario
+const saludarUsuario = (nombre) => alert("Bienvenida/o " + nombre);
+
+//Función agregar usuario
+const agregarUsuario = (usuario) => usuarios.push(usuario);
+
+//Función agregar usuario a arreglo de nombresUsuario
+const agregarNombresUsuario = (nombre) => nombresUsuario.push(nombre);
+
+//Función agregar contraseña a arreglo passwordsUsuario
+const agregarPasswordsUsuario = (password) => passwordsUsuario.push(password);
+
 //-----------------------------------------------------COMIENZO DE MAIN-----------------------------------------------------//
 
 //Generación de usuario
-nombreUsuario = prompt("Por favor ingrese nuevo nombre de usuario");
-do{
-    passwordUsuario = parseInt(prompt("Por favor ingrese nueva clave numérica para usuario"));
-    passwordCorrecto = isNaN(passwordUsuario);
-}while(passwordCorrecto)
-do{
-    permisosUsuario = prompt("Ingrese los permisos que va a tener este usuario\n - TOTAL\n - PARCIAL")
-    if(permisosUsuario == "TOTAL"){
-        permisoCorrecto = false;
-    }else if(permisosUsuario == "PARCIAL"){
-        permisoCorrecto = false;
+while (finalizar){
+    finalizarNewUsuario = prompt("Desea agregar un nuevo usuario?\n- SI\n- NO")
+    if (finalizarNewUsuario == "SI"){
+        nombreUsuario = prompt("Por favor ingrese nuevo nombre de usuario (máximo 4 usuarios nuevos)");
+        do{
+            passwordUsuario = parseInt(prompt("Por favor ingrese nueva clave numérica para usuario"));
+            passwordCorrecto = isNaN(passwordUsuario);
+        }while(passwordCorrecto)
+        do{
+            permisosUsuario = prompt("Ingrese los permisos que va a tener este usuario\n - TOTAL\n - PARCIAL")
+            if(permisosUsuario == "TOTAL"){
+                permisoCorrecto = false;
+            }else if(permisosUsuario == "PARCIAL"){
+                permisoCorrecto = false;
+            }else{
+                permisoCorrecto = true;
+            }
+        }while(permisoCorrecto)
+    const usuarioNuevo = new usuario(nombreUsuario, passwordUsuario, permisosUsuario);
+    agregarUsuario(usuarioNuevo);
+    }else if (finalizarNewUsuario == "NO"){
+        finalizar = false;
     }else{
-        permisoCorrecto = true;
+        finalizar = true;
     }
-}while(permisoCorrecto)
+}
 
-const usuarioMaster = new usuario(nombreUsuario, passwordUsuario, permisosUsuario);
+console.log(usuarios);
+for (const iterator of usuarios) {
+    agregarNombresUsuario(iterator.nombre);
+}
+for (const iterator of usuarios) {
+    agregarPasswordsUsuario(iterator.password);
+}
+
+console.log(nombresUsuario);
+console.log(passwordsUsuario);
 
 //Login de usuario creado
 for (let i = 0; i < limitRetry; i++) {
     let usuarioName = prompt("Ingrese usuario").toUpperCase();
     let contrasenia = parseInt(prompt("Ingrese contraseña"));
-    
-    if (usuarioName == usuarioMaster.nombre && contrasenia == usuarioMaster.password){
-        usuarioMaster.saludar();
+    if ((usuarioName == nombresUsuario[0] || usuarioName == nombresUsuario[1] || usuarioName == nombresUsuario[2] || usuarioName == nombresUsuario[3]) && (contrasenia == passwordsUsuario[0] || contrasenia == passwordsUsuario[1] || usuarioName == nombresUsuario[2]  || usuarioName == nombresUsuario[3])){
+        saludarUsuario(usuarioName);
         i = 10;
         flagLogueo = true;
     }else{
@@ -117,15 +174,30 @@ if (flagLogueo == true){
     if(permisosUsuario == "TOTAL"){
         comprar(0.5);
     }else{
-        comprar(1.00);
+        comprar(1.00);     
     }
+//Carga de nombres al array productosNombre
+    for (const iterator of productos) {
+        productosNombre.push(iterator.nombre);
+    }
+
+//Separación de items en array productosNombre por ','
+productosNombre.join(", ");
+
     //Finalizar compra por FINALIZAR o por CANCELAR
     if (opcion != "CANCELAR"){
         alert("El total de la compra es $" + precioTotal + " por la compra de " + cantidadProductos + " productos.");
-        console.log("El total de la compra es $" + precioTotal + " por la compra de " + cantidadProductos + " productos.");  
+        console.log("El total de la compra es $" + precioTotal + " por la compra de " + cantidadProductos + " productos.");
+        console.log(productos);
+        console.log(productosNombre); 
+        alert("Los productos comprados son " + productosNombre)
+        console.log("Los productos comprados son " + productosNombre); 
     }else{
         alert("La compra fue cancelada.");
         console.error("La compra fue cancelada.");
+        productos = [];
+        console.log(productos);
+        console.log("Los productos retirados del carrito son " + productosNombre); 
     }    
 }else{
     alert("Falla en el login");
